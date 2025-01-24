@@ -14,22 +14,25 @@ class InventoryModel {
   });
 
   factory InventoryModel.fromJson(Map<String, dynamic> json) {
+    var fields = json['fields'];
     return InventoryModel(
       id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      price: json['price'],
-      quantity: json['quantity'],
+      title: fields['Title'],
+      description: fields['Description'],
+      price: (fields['Price'] ?? 0).toDouble(),
+      quantity: fields['Quantity'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'title': title,
-      'description': description,
-      'price': price,
-      'quantity': quantity,
+      'fields': {
+        'Title': title,
+        'Description': description,
+        'Price': price,
+        'Quantity': quantity,
+      },
     };
   }
 }

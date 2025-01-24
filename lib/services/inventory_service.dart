@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 
 class InventoryService {
-  final String apiUrl = 'https://inventories.globeapp.dev/inventories';
+  final String apiUrl = 'https://inventories-ifxqr3l-jordy-dave.globeapp.dev';
   final Logger _logger = Logger('InventoryService');
 
   InventoryService() {
@@ -18,16 +18,18 @@ class InventoryService {
   }
 
   Future<List<InventoryModel>> getInventories() async {
-    _logger.info('Fetching inventories from API $apiUrl');
+    String getInventories = '$apiUrl/getInventories';
+    _logger.info('Fetching inventories from API $getInventories');
     _logger.info('curl -X GET "$apiUrl" -H "accept: application/json"');
     try {
-      final response = await _getClient().get(Uri.parse(apiUrl));
+      final response = await _getClient().get(Uri.parse(getInventories));
 
       if (response.statusCode == 200) {
-        List jsonResponse = json.decode(response.body);
+        List<dynamic> jsonResponse = json.decode(response.body);
         _logger.info('Fetched ${jsonResponse.length} inventories from API');
         return jsonResponse
-            .map((data) => InventoryModel.fromJson(data))
+            .map(
+                (data) => InventoryModel.fromJson(data as Map<String, dynamic>))
             .toList();
       } else {
         _logger.severe(
@@ -40,33 +42,37 @@ class InventoryService {
     }
   }
 
-  Future<InventoryModel> getInventory(String id) async {
-    _logger.info('Fetching inventory $id from API $apiUrl');
-    _logger.info('curl -X GET "$apiUrl/$id" -H "accept: application/json"');
-    final response = await _getClient().get(Uri.parse('$apiUrl/$id'));
+  Future<InventoryModel> getInventoryById(String recordId) async {
+    String getInventory = '$apiUrl/getInventoryById?recordId=$recordId';
+    _logger.info('Fetching inventory $recordId from API $getInventory');
+    _logger
+        .info('curl -X GET "$apiUrl/$recordId" -H "accept: application/json"');
+    final response =
+        await _getClient().get(Uri.parse(getInventory));
 
     if (response.statusCode == 200) {
-      _logger.info('Fetched inventory $id from API');
+      _logger.info('Fetched inventory $recordId from API');
       return InventoryModel.fromJson(json.decode(response.body));
     } else {
-      _logger.severe('Failed to load inventory $id from API');
+      _logger.severe('Failed to load inventory $recordId from API');
       throw Exception('Failed to load inventory from API');
     }
   }
 
   Future<InventoryModel> createInventory(InventoryModel inventory) async {
-    _logger.info('Creating inventory from API $apiUrl');
+    String createInventory = '$apiUrl/createInventory';
+    _logger.info('Creating inventory from API $createInventory');
     _logger.info(
-        'curl -X POST "$apiUrl" -H "accept: application/json" -H "Content-Type: application/json" -d \'${jsonEncode(inventory.toJson())}\'');
+        'curl -X POST "$createInventory" -H "accept: application/json" -H "Content-Type: application/json" -d \'${jsonEncode(inventory.toJson())}\'');
     final response = await _getClient().post(
-      Uri.parse(apiUrl),
+      Uri.parse(createInventory),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(inventory.toJson()),
     );
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       _logger.info('Created inventory from API');
       return InventoryModel.fromJson(json.decode(response.body));
     } else {
@@ -76,12 +82,13 @@ class InventoryService {
   }
 
   Future<InventoryModel> updateInventory(
-      String id, InventoryModel inventory) async {
-    _logger.info('Updating inventory $id from API $apiUrl');
+      String recordId, InventoryModel inventory) async {
+    String updateInventory = '$apiUrl/updateInventory';
+    _logger.info('Updating inventory $recordId from API $updateInventory');
     _logger.info(
-        'curl -X PUT "$apiUrl/$id" -H "accept: application/json" -H "Content-Type: application/json" -d \'${jsonEncode(inventory.toJson())}\'');
+        'curl -X PUT "$apiUrl/$recordId" -H "accept: application/json" -H "Content-Type: application/json" -d \'${jsonEncode(inventory.toJson())}\'');
     final response = await _getClient().put(
-      Uri.parse('$apiUrl/$id'),
+      Uri.parse('$updateInventory/$recordId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -89,20 +96,28 @@ class InventoryService {
     );
 
     if (response.statusCode == 200) {
-      _logger.info('Updated inventory $id from API');
+      _logger.info('Updated inventory $recordId from API');
       return InventoryModel.fromJson(json.decode(response.body));
     } else {
-      _logger.severe('Failed to update inventory $id from API');
+      _logger.severe('Failed to update inventory $recordId from API');
       throw Exception('Failed to update inventory from API');
     }
   }
 
-  Future<void> deleteInventory(String id) async {
-    _logger.info('Deleting inventory $id from API $apiUrl');
-    final response = await _getClient().delete(Uri.parse('$apiUrl/$id'));
+  Future<void> deleteInventory(String recordId) async {
+    String deleteInventory = '$apiUrl/deleteInventory';
+    _logger.info('Deleting inventory $recordId from API $deleteInventory');
+    final response = await _getClient().delete(
+      Uri.parse('$deleteInventory?recordId=$recordId'),
+    );
 
-    if (response.statusCode != 204) {
-      _logger.severe('Failed to delete inventory $id from API');
+    _logger.info('Response status: ${response.statusCode}');
+    _logger.info('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      _logger.info('Deleted inventory $recordId from API');
+    } else {
+      _logger.severe('Failed to delete inventory $recordId from API');
       throw Exception('Failed to delete inventory from API');
     }
   }
