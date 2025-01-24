@@ -1,3 +1,4 @@
+import 'package:crud_api/pages/list_inventory_page.dart';
 import 'package:flutter/material.dart';
 import 'package:crud_api/models/inventory_model.dart';
 import 'package:crud_api/services/inventory_service.dart';
@@ -77,12 +78,15 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
 
       try {
         await _inventoryService.createInventory(newInventory);
-        _inventoryService.getInventories();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Inventory added successfully')),
           );
-          Navigator.pop(context);
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const ListInventoryPage()),
+            (route) => false,
+          );
         }
       } catch (e) {
         if (mounted) {

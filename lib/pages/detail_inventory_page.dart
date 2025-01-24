@@ -1,3 +1,4 @@
+import 'package:crud_api/pages/list_inventory_page.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:flutter/material.dart';
 import 'package:crud_api/models/inventory_model.dart';
@@ -22,8 +23,12 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
     _futureInventory = _inventoryService.getInventoryById(widget.inventoryId);
   }
 
-  void backPage() {
-    Navigator.pop(context);
+  void backToHome() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const ListInventoryPage()),
+      (route) => false,
+    );
   }
 
   @override
@@ -35,7 +40,7 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
           IconButton(
             onPressed: () {
               _inventoryService.deleteInventory(widget.inventoryId).then((_) {
-                backPage();
+                backToHome();
               });
             },
             icon: const Icon(Icons.delete),
