@@ -4,6 +4,7 @@ import 'package:crud_api/pages/detail_inventory_page.dart';
 import 'package:crud_api/services/inventory_service.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:flutter/material.dart';
+import 'package:marquee/marquee.dart';
 
 class ListInventoryPage extends StatefulWidget {
   const ListInventoryPage({super.key});
@@ -146,13 +147,17 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
                         }));
                       },
                       child: Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0),
                         child: ListTile(
-                          contentPadding: const EdgeInsets.all(16.0),
-                          title: Text(
-                            inventory.title ?? '',
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                          title: SizedBox(
+                            height: 40,
+                            child: Marquee(
+                              text: inventory.title!,
+                              blankSpace: 20.0,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,17 +171,6 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
                                 style: const TextStyle(fontSize: 16),
                               ),
                             ],
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () async {
-                              await _inventoryService
-                                  .deleteInventory(inventory.id!);
-                              setState(() {
-                                _futureInventory =
-                                    _inventoryService.getInventories();
-                              });
-                            },
                           ),
                         ),
                       ),

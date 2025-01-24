@@ -16,6 +16,7 @@ class DetailInventoryPage extends StatefulWidget {
 class _DetailInventoryPageState extends State<DetailInventoryPage> {
   late Future<InventoryModel> _futureInventory;
   final InventoryService _inventoryService = InventoryService();
+  bool _isDeleting = false;
 
   @override
   void initState() {
@@ -31,6 +32,31 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
     );
   }
 
+  Future<void> _deleteInventory() async {
+    setState(() {
+      _isDeleting = true;
+    });
+    try {
+      await _inventoryService.deleteInventory(widget.inventoryId);
+      backToHome();
+    } catch (e) {
+      snackbarMessage('Failed to delete inventory: $e');
+    } finally {
+      setState(() {
+        _isDeleting = false;
+      });
+    }
+  }
+
+  void snackbarMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,12 +64,10 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
         title: const Text('Inventory Details'),
         actions: [
           IconButton(
-            onPressed: () {
-              _inventoryService.deleteInventory(widget.inventoryId).then((_) {
-                backToHome();
-              });
-            },
-            icon: const Icon(Icons.delete),
+            onPressed: _isDeleting ? null : _deleteInventory,
+            icon: _isDeleting
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Icon(Icons.delete),
           ),
         ],
       ),
