@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:crud_api/models/inventory_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +7,9 @@ import 'package:logging/logging.dart';
 
 class InventoryService {
   final String apiUrl = 'https://inventories-ifxqr3l-jordy-dave.globeapp.dev';
+  final String githubUsername = 'jordydave';
+  final String githubRepo = 'store_image';
+  final String githubToken = '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';
   final Logger _logger = Logger('InventoryService');
 
   InventoryService() {
@@ -15,6 +19,39 @@ class InventoryService {
         print('${record.level.name}: ${record.time}: ${record.message}');
       }
     });
+  }
+
+  Future<String> uploadImageToGitHub(File image) async {
+    final imageBytes = await image.readAsBytes();
+    final base64Image = base64Encode(imageBytes);
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+    final url =
+        'https://api.github.com/repos/$githubUsername/$githubRepo/contents/$fileName';
+    _logger.info('GitHub API URL: $url');
+
+    final response = await http.put(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'token $githubToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'message': 'Upload image $fileName',
+        'content': base64Image,
+      }),
+    );
+
+    _logger.info('Response: ${response.body}');
+    _logger.info('Status Code: ${response.statusCode}');
+
+    if (response.statusCode == 201) {
+      final responseData = jsonDecode(response.body);
+      final downloadUrl = responseData['content']['download_url'];
+      return downloadUrl;
+    } else {
+      throw Exception('Failed to upload image to GitHub: ${response.body}');
+    }
   }
 
   Future<List<InventoryModel>> getInventories() async {
@@ -47,8 +84,7 @@ class InventoryService {
     _logger.info('Fetching inventory $recordId from API $getInventory');
     _logger
         .info('curl -X GET "$apiUrl/$recordId" -H "accept: application/json"');
-    final response =
-        await _getClient().get(Uri.parse(getInventory));
+    final response = await _getClient().get(Uri.parse(getInventory));
 
     if (response.statusCode == 200) {
       _logger.info('Fetched inventory $recordId from API');

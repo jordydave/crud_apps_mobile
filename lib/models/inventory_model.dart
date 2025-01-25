@@ -4,6 +4,7 @@ class InventoryModel {
   final String? description;
   final double? price;
   final int? quantity;
+  final String? imageUrl;
 
   InventoryModel({
     this.id = '',
@@ -11,6 +12,7 @@ class InventoryModel {
     this.description = '',
     this.price = 0.0,
     this.quantity = 0,
+    this.imageUrl = '',
   });
 
   factory InventoryModel.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,7 @@ class InventoryModel {
       description: fields['Description'],
       price: (fields['Price'] ?? 0).toDouble(),
       quantity: fields['Quantity'],
+      imageUrl: fields['Image URL'],
     );
   }
 
@@ -32,6 +35,7 @@ class InventoryModel {
         'Description': description,
         'Price': price,
         'Quantity': quantity,
+        'Image URL': imageUrl,
       },
     };
   }

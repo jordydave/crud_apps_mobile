@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:crud_api/pages/list_inventory_page.dart';
 import 'package:flutter/material.dart';
 import 'package:crud_api/models/inventory_model.dart';
 import 'package:crud_api/services/inventory_service.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddInventoryPage extends StatefulWidget {
   const AddInventoryPage({super.key});
@@ -19,6 +21,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
   final _quantityController = TextEditingController();
   final InventoryService _inventoryService = InventoryService();
   bool _isLoading = false;
+  File? _image;
 
   @override
   void initState() {
@@ -64,16 +67,33 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
+
+      String? imageUrl;
+      if (_image != null) {
+        imageUrl = await _inventoryService.uploadImageToGitHub(_image!);
+      }
+
       final newInventory = InventoryModel(
         title: _titleController.text,
         price: double.parse(
             _priceController.text.replaceAll(RegExp(r'[^0-9]'), '')),
         quantity: int.parse(_quantityController.text),
+        imageUrl: imageUrl,
       );
 
       try {
@@ -161,6 +181,16 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _pickImage,
+                    child: const Text('Pick Image'),
+                  ),
+                  if (_image != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Image.file(_image!),
+                    ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _isLoading ? null : _submitForm,
