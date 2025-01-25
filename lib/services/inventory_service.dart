@@ -9,7 +9,7 @@ class InventoryService {
   final String apiUrl = 'https://inventories-ifxqr3l-jordy-dave.globeapp.dev';
   final String githubUsername = 'jordydave';
   final String githubRepo = 'store_image';
-  final String githubToken = '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';
+  final String githubToken = '';
   final Logger _logger = Logger('InventoryService');
 
   InventoryService() {
