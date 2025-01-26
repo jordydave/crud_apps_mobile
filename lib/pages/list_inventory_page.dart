@@ -4,7 +4,6 @@ import 'package:crud_api/pages/detail_inventory_page.dart';
 import 'package:crud_api/services/inventory_service.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:flutter/material.dart';
-import 'package:marquee/marquee.dart';
 
 class ListInventoryPage extends StatefulWidget {
   const ListInventoryPage({super.key});
@@ -49,13 +48,17 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (_) {
             return const AddInventoryPage();
           }));
         },
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
       appBar: AppBar(
         title: const Text('List Inventory'),
@@ -67,7 +70,11 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
               onChanged: _updateSearchQuery,
               decoration: InputDecoration(
                 hintText: 'Search...',
-                prefixIcon: const Icon(Icons.search),
+                hintStyle: const TextStyle(color: Colors.white),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -127,51 +134,73 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
                   ),
                 );
               } else {
-                return GridView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 3 / 2,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                  ),
+                return ListView.builder(
                   itemCount: filteredInventory.length,
-                  itemBuilder: (context, index) {
-                    final inventory = filteredInventory[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) {
-                          return DetailInventoryPage(
-                            inventoryId: inventory.id!,
-                          );
-                        }));
-                      },
-                      child: Card(
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.grey,
+                              blurRadius: 2.0,
+                              spreadRadius: 0.0,
+                              offset: Offset(2.0, 2.0),
+                            ),
+                          ],
+                        ),
                         child: ListTile(
-                          title: SizedBox(
-                            height: 40,
-                            child: Marquee(
-                              text: inventory.title!,
-                              blankSpace: 20.0,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.network(
+                              filteredInventory[index].imageUrl!,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                          subtitle: Column(
+                          title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Price: ${NumberFormatCurrency.formatCurrencyIdr(inventory.price!)}',
+                                filteredInventory[index].title!,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text("ID: ${filteredInventory[index].id!}"),
+                              SizedBox(height: 10),
+                            ],
+                          ),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Stock: ${filteredInventory[index].quantity}',
                                 style: const TextStyle(fontSize: 16),
                               ),
                               Text(
-                                'Stock: ${inventory.quantity}',
-                                style: const TextStyle(fontSize: 16),
+                                NumberFormatCurrency.formatCurrencyIdr(
+                                    filteredInventory[index].price!),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (_) {
+                              return DetailInventoryPage(
+                                inventoryId: filteredInventory[index].id!,
+                              );
+                            }));
+                          },
                         ),
                       ),
                     );
