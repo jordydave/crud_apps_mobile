@@ -29,7 +29,7 @@ class InventoryModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'recordId': id,
       'fields': {
         'Title': title,
         'Description': description,

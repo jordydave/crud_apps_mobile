@@ -124,7 +124,7 @@ class InventoryService {
     _logger.info(
         'curl -X PUT "$apiUrl/$recordId" -H "accept: application/json" -H "Content-Type: application/json" -d \'${jsonEncode(inventory.toJson())}\'');
     final response = await _getClient().put(
-      Uri.parse('$updateInventory/$recordId'),
+      Uri.parse(updateInventory),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

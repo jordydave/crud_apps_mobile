@@ -1,3 +1,4 @@
+import 'package:crud_api/pages/edit_inventory_page.dart';
 import 'package:crud_api/pages/list_inventory_page.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +69,14 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
             icon: _isDeleting
                 ? const CircularProgressIndicator(color: Colors.white)
                 : const Icon(Icons.delete),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) {
+                return EditInventoryPage(inventoryId: widget.inventoryId);
+              }));
+            },
+            icon: const Icon(Icons.edit),
           ),
         ],
       ),
