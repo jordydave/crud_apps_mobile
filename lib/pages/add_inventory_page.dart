@@ -56,7 +56,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       if (_image == null) {
-        AppUtils.showSnackBar(context, 'Please pick an image');
+        _showSnackBar('Please pick an image');
         return;
       }
 
@@ -64,42 +64,50 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
         _isLoading = true;
       });
 
-      String? imageUrl;
-      if (_image != null) {
-        imageUrl = await _inventoryService.uploadImageToGitHub(_image!);
-      }
-
-      final newInventory = InventoryModel(
-        title: _titleController.text,
-        description: _descriptionController.text,
-        price: double.parse(
-            _priceController.text.replaceAll(RegExp(r'[^0-9]'), '')),
-        quantity: int.parse(_quantityController.text),
-        imageUrl: imageUrl,
-      );
-
       try {
+        final imageUrl = await _uploadImage();
+        final newInventory = _createInventoryModel(imageUrl);
         await _inventoryService.createInventory(newInventory);
-        if (mounted) {
-          AppUtils.showSnackBar(context, 'Inventory added successfully');
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const ListInventoryPage()),
-            (route) => false,
-          );
-        }
+        _showSnackBar('Inventory added successfully');
+        _navigateToListInventoryPage();
       } catch (e) {
-        if (mounted) {
-          AppUtils.showSnackBar(context, 'Error: $e');
-        }
+        _showSnackBar('Error: $e');
       } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+  Future<String?> _uploadImage() async {
+    if (_image != null) {
+      return await _inventoryService.uploadImageToGitHub(_image!);
+    }
+    return null;
+  }
+
+  InventoryModel _createInventoryModel(String? imageUrl) {
+    return InventoryModel(
+      title: _titleController.text,
+      description: _descriptionController.text,
+      price:
+          double.parse(_priceController.text.replaceAll(RegExp(r'[^0-9]'), '')),
+      quantity: int.parse(_quantityController.text),
+      imageUrl: imageUrl,
+    );
+  }
+
+  void _showSnackBar(String message) {
+    AppUtils.showSnackBar(context, message);
+  }
+
+  void _navigateToListInventoryPage() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const ListInventoryPage()),
+      (route) => false,
+    );
   }
 
   @override

@@ -62,7 +62,7 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
       });
     } catch (e) {
       if (mounted) {
-        AppUtils.showSnackBar(context, 'Error: $e');
+        _showSnackBar('Error: $e');
       }
     } finally {
       setState(() {
@@ -105,16 +105,12 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
         await _inventoryService.updateInventory(
             widget.inventoryId, updatedInventory);
         if (mounted) {
-          AppUtils.showSnackBar(context, 'Inventory updated successfully');
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const ListInventoryPage()),
-            (route) => false,
-          );
+          _showSnackBar('Inventory updated successfully');
+          _navigateToListInventoryPage();
         }
       } catch (e) {
         if (mounted) {
-          AppUtils.showSnackBar(context, 'Error: $e');
+          _showSnackBar('Error: $e');
         }
       } finally {
         if (mounted) {
@@ -124,6 +120,18 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
         }
       }
     }
+  }
+
+  void _showSnackBar(String message) {
+    AppUtils.showSnackBar(context, message);
+  }
+
+  void _navigateToListInventoryPage() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const ListInventoryPage()),
+      (route) => false,
+    );
   }
 
   @override
@@ -150,7 +158,7 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   SharedTextFormField(
                     controller: _priceController,
                     labelText: 'Price',
@@ -170,7 +178,7 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   SharedTextFormField(
                     controller: _quantityController,
                     labelText: 'Quantity',

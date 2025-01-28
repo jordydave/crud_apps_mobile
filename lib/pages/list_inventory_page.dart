@@ -46,6 +46,135 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
         .toList();
   }
 
+  Widget _buildError(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error, color: Colors.red, size: 64),
+          const SizedBox(height: 16),
+          Text(
+            'Error: $error',
+            style: const TextStyle(fontSize: 18, color: Colors.red),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _refreshInventory,
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmpty() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.inbox, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text(
+            'No data found',
+            style: TextStyle(fontSize: 18, color: Colors.grey),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _refreshInventory,
+            child: const Text('Refresh'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInventoryList(List<InventoryModel> inventory) {
+    final filteredInventory = _filterInventory(inventory);
+    if (filteredInventory.isEmpty) {
+      return _buildEmpty();
+    } else {
+      return ListView.builder(
+        itemCount: filteredInventory.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.0),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.grey,
+                    blurRadius: 2.0,
+                    spreadRadius: 0.0,
+                    offset: Offset(2.0, 2.0),
+                  ),
+                ],
+              ),
+              child: ListTile(
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.network(
+                    filteredInventory[index].imageUrl ?? '',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.error,
+                        color: Colors.grey,
+                        size: 48,
+                      );
+                    },
+                  ),
+                ),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      filteredInventory[index].title!,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text("ID: ${filteredInventory[index].id!}"),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Stock: ${filteredInventory[index].quantity}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      NumberFormatCurrency.formatCurrencyIdr(
+                          filteredInventory[index].price!),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) {
+                    return DetailInventoryPage(
+                      inventoryId: filteredInventory[index].id!,
+                    );
+                  }));
+                },
+              ),
+            ),
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,127 +222,11 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return SharedShimmerList();
             } else if (snapshot.hasError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error, color: Colors.red, size: 64),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error: ${snapshot.error}',
-                      style: const TextStyle(fontSize: 18, color: Colors.red),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _refreshInventory,
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              );
+              return _buildError(snapshot.error.toString());
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return _buildEmpty();
             } else {
-              final filteredInventory = _filterInventory(snapshot.data!);
-              if (filteredInventory.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.inbox, size: 64, color: Colors.grey),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'No data found',
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _refreshInventory,
-                        child: const Text('Refresh'),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                return ListView.builder(
-                  itemCount: filteredInventory.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2.0,
-                              spreadRadius: 0.0,
-                              offset: Offset(2.0, 2.0),
-                            ),
-                          ],
-                        ),
-                        child: ListTile(
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(8.0),
-                            child: Image.network(
-                              filteredInventory[index].imageUrl ?? '',
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.error,
-                                  color: Colors.grey,
-                                  size: 48,
-                                );
-                              },
-                            ),
-                          ),
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                filteredInventory[index].title!,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text("ID: ${filteredInventory[index].id!}"),
-                              const SizedBox(height: 10),
-                            ],
-                          ),
-                          subtitle: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Stock: ${filteredInventory[index].quantity}',
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                              Text(
-                                NumberFormatCurrency.formatCurrencyIdr(
-                                    filteredInventory[index].price!),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (_) {
-                              return DetailInventoryPage(
-                                inventoryId: filteredInventory[index].id!,
-                              );
-                            }));
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                );
-              }
+              return _buildInventoryList(snapshot.data!);
             }
           },
         ),
