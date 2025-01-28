@@ -11,6 +11,8 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:ui';
 
+import 'package:skeletonizer/skeletonizer.dart';
+
 class AddInventoryPage extends StatefulWidget {
   const AddInventoryPage({super.key});
 
@@ -122,83 +124,86 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
             padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
-              child: ListView(
-                children: [
-                  SharedTextFormField(
-                    controller: _titleController,
-                    labelText: 'Title',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a title';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  SharedTextFormField(
-                    controller: _descriptionController,
-                    labelText: 'Description',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a description';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  SharedTextFormField(
-                    controller: _priceController,
-                    labelText: 'Price',
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a price';
-                      }
-                      if (double.tryParse(
-                              value.replaceAll(RegExp(r'[^0-9]'), '')) ==
-                          null) {
-                        return 'Please enter a valid number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  SharedTextFormField(
-                    controller: _quantityController,
-                    labelText: 'Quantity',
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a quantity';
-                      }
-                      if (int.tryParse(value) == null) {
-                        return 'Please enter a valid number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _pickImage,
-                    child: const Text('Pick Image'),
-                  ),
-                  if (_image != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: Image.file(_image!),
-                      ),
+              child: Skeletonizer(
+                enabled: _isLoading,
+                child: ListView(
+                  children: [
+                    SharedTextFormField(
+                      controller: _titleController,
+                      labelText: 'Title',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a title';
+                        }
+                        return null;
+                      },
                     ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : _submitForm,
-                    child: const Text('Add Inventory'),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    SharedTextFormField(
+                      controller: _descriptionController,
+                      labelText: 'Description',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a description';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    SharedTextFormField(
+                      controller: _priceController,
+                      labelText: 'Price',
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a price';
+                        }
+                        if (double.tryParse(
+                                value.replaceAll(RegExp(r'[^0-9]'), '')) ==
+                            null) {
+                          return 'Please enter a valid number';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    SharedTextFormField(
+                      controller: _quantityController,
+                      labelText: 'Quantity',
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a quantity';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return 'Please enter a valid number';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _pickImage,
+                      child: const Text('Pick Image'),
+                    ),
+                    if (_image != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.file(_image!),
+                        ),
+                      ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _submitForm,
+                      child: const Text('Add Inventory'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
