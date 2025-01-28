@@ -7,6 +7,9 @@ import 'package:crud_api/services/inventory_service.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:ui';
+
+import 'package:loading_indicator/loading_indicator.dart';
 
 class AddInventoryPage extends StatefulWidget {
   const AddInventoryPage({super.key});
@@ -141,13 +144,13 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
       appBar: AppBar(
         title: const Text('Add Inventory'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Stack(
-            children: [
-              ListView(
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: ListView(
                 children: [
                   SharedTextFormField(
                     controller: _titleController,
@@ -159,7 +162,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   SharedTextFormField(
                     controller: _descriptionController,
                     labelText: 'Description',
@@ -170,7 +173,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   SharedTextFormField(
                     controller: _priceController,
                     labelText: 'Price',
@@ -190,7 +193,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   SharedTextFormField(
                     controller: _quantityController,
                     labelText: 'Quantity',
@@ -213,7 +216,10 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                   if (_image != null)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Image.file(_image!),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: Image.file(_image!),
+                      ),
                     ),
                   const SizedBox(height: 20),
                   ElevatedButton(
@@ -222,13 +228,26 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                   ),
                 ],
               ),
-              if (_isLoading)
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
-            ],
+            ),
           ),
-        ),
+          if (_isLoading)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.5),
+                child: const Center(
+                  child: SizedBox(
+                    width: 50,
+                    child: LoadingIndicator(
+                      indicatorType: Indicator.ballPulse,
+                      colors: [Colors.white],
+                      strokeWidth: 2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
