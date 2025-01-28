@@ -1,9 +1,11 @@
 import 'package:crud_api/pages/edit_inventory_page.dart';
 import 'package:crud_api/pages/list_inventory_page.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
+import 'package:crud_api/widgets/shared_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:crud_api/models/inventory_model.dart';
 import 'package:crud_api/services/inventory_service.dart';
+import 'dart:ui';
 
 class DetailInventoryPage extends StatefulWidget {
   final String inventoryId;
@@ -66,9 +68,7 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
         actions: [
           IconButton(
             onPressed: _isDeleting ? null : _deleteInventory,
-            icon: _isDeleting
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Icon(Icons.delete),
+            icon: const Icon(Icons.delete),
           ),
           IconButton(
             onPressed: () {
@@ -80,91 +80,100 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
           ),
         ],
       ),
-      body: FutureBuilder<InventoryModel>(
-        future: _futureInventory,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error, color: Colors.red, size: 64),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error: ${snapshot.error}',
-                    style: const TextStyle(fontSize: 18, color: Colors.red),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _futureInventory = _inventoryService
-                            .getInventoryById(widget.inventoryId);
-                      });
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(
-              child: Text('No data found'),
-            );
-          } else {
-            final inventory = snapshot.data!;
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    inventory.title ?? 'No Title',
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Description: ${inventory.description ?? 'No Description'}',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Price: ${NumberFormatCurrency.formatCurrencyIdr(inventory.price ?? 0)}',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Quantity: ${inventory.quantity}',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8.0),
+      body: Stack(
+        children: [
+          FutureBuilder<InventoryModel>(
+            future: _futureInventory,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error, color: Colors.red, size: 64),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error: ${snapshot.error}',
+                        style: const TextStyle(fontSize: 18, color: Colors.red),
+                        textAlign: TextAlign.center,
                       ),
-                      child: Image.network(
-                        inventory.imageUrl ?? '',
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: Text('Image not found'),
-                          );
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _futureInventory = _inventoryService
+                                .getInventoryById(widget.inventoryId);
+                          });
                         },
+                        child: const Text('Retry'),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          }
-        },
+                );
+              } else if (!snapshot.hasData || snapshot.data == null) {
+                return const Center(
+                  child: Text('No data found'),
+                );
+              } else {
+                final inventory = snapshot.data!;
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        inventory.title ?? 'No Title',
+                        style: const TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Description: ${inventory.description ?? 'No Description'}',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Price: ${NumberFormatCurrency.formatCurrencyIdr(inventory.price ?? 0)}',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Quantity: ${inventory.quantity}',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Image.network(
+                            inventory.imageUrl ?? '',
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(
+                                child: Text('Image not found'),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
+          if (_isDeleting)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: SharedLoading(),
+            ),
+        ],
       ),
     );
   }

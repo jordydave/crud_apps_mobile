@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:crud_api/pages/list_inventory_page.dart';
+import 'package:crud_api/widgets/shared_loading.dart';
 import 'package:crud_api/widgets/shared_textformfield.dart';
 import 'package:flutter/material.dart';
 import 'package:crud_api/models/inventory_model.dart';
@@ -8,8 +9,6 @@ import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:ui';
-
-import 'package:loading_indicator/loading_indicator.dart';
 
 class AddInventoryPage extends StatefulWidget {
   const AddInventoryPage({super.key});
@@ -233,19 +232,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
           if (_isLoading)
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Container(
-                color: Colors.black.withValues(alpha: 0.5),
-                child: const Center(
-                  child: SizedBox(
-                    width: 50,
-                    child: LoadingIndicator(
-                      indicatorType: Indicator.ballPulse,
-                      colors: [Colors.white],
-                      strokeWidth: 2,
-                    ),
-                  ),
-                ),
-              ),
+              child: SharedLoading(),
             ),
         ],
       ),
