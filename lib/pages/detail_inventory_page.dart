@@ -7,6 +7,8 @@ import 'package:crud_api/models/inventory_model.dart';
 import 'package:crud_api/services/inventory_service.dart';
 import 'dart:ui';
 
+import 'package:skeletonizer/skeletonizer.dart';
+
 class DetailInventoryPage extends StatefulWidget {
   final String inventoryId;
 
@@ -123,49 +125,52 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
                 final inventory = snapshot.data!;
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        inventory.title ?? 'No Title',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Description: ${inventory.description ?? 'No Description'}',
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Price: ${NumberFormatCurrency.formatCurrencyIdr(inventory.price ?? 0)}',
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Quantity: ${inventory.quantity}',
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(height: 16),
-                      Center(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Image.network(
-                            inventory.imageUrl ?? '',
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                child: Text('Image not found'),
-                              );
-                            },
+                  child: Skeletonizer(
+                    enabled: _isDeleting,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          inventory.title ?? 'No Title',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        Text(
+                          'Description: ${inventory.description ?? 'No Description'}',
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Price: ${NumberFormatCurrency.formatCurrencyIdr(inventory.price ?? 0)}',
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Quantity: ${inventory.quantity}',
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Image.network(
+                              inventory.imageUrl ?? '',
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(
+                                  child: Text('Image not found'),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }
