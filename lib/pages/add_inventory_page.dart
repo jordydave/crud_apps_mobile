@@ -17,6 +17,7 @@ class AddInventoryPage extends StatefulWidget {
 class _AddInventoryPageState extends State<AddInventoryPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _quantityController = TextEditingController();
   final InventoryService _inventoryService = InventoryService();
@@ -32,6 +33,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
   @override
   void dispose() {
     _titleController.dispose();
+    _descriptionController.dispose();
     _priceController.dispose();
     _quantityController.dispose();
     super.dispose();
@@ -79,6 +81,13 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      if (_image == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please pick an image')),
+        );
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
@@ -90,6 +99,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
 
       final newInventory = InventoryModel(
         title: _titleController.text,
+        description: _descriptionController.text,
         price: double.parse(
             _priceController.text.replaceAll(RegExp(r'[^0-9]'), '')),
         quantity: int.parse(_quantityController.text),
@@ -144,6 +154,16 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter a title';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _descriptionController,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a description';
                       }
                       return null;
                     },

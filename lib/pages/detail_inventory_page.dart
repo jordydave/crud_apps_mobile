@@ -143,16 +143,22 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
                     'Quantity: ${inventory.quantity}',
                     style: const TextStyle(fontSize: 18),
                   ),
-                  Image.network(
-                    inventory.imageUrl ?? '',
-                    errorBuilder: (context, error, stackTrace) {
-                      return const SizedBox(
-                        height: 200,
-                        child: Center(
-                          child: Text('Image not found'),
-                        ),
-                      );
-                    },
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Image.network(
+                        inventory.imageUrl ?? '',
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Text('Image not found'),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),

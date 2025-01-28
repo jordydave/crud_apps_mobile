@@ -67,6 +67,7 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              style: const TextStyle(color: Colors.white),
               onChanged: _updateSearchQuery,
               decoration: InputDecoration(
                 hintText: 'Search...',
@@ -156,8 +157,15 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
                           leading: ClipRRect(
                             borderRadius: BorderRadius.circular(8.0),
                             child: Image.network(
-                              filteredInventory[index].imageUrl!,
+                              filteredInventory[index].imageUrl ?? '',
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.error,
+                                  color: Colors.grey,
+                                  size: 48,
+                                );
+                              },
                             ),
                           ),
                           title: Column(
