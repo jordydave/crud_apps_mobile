@@ -1,9 +1,5 @@
-import 'package:crud_api/models/inventory_model.dart';
 import 'package:crud_api/pages/add_inventory_page.dart';
 import 'package:crud_api/pages/detail_inventory_page.dart';
-import 'package:crud_api/services/inventory_service.dart';
-import 'package:crud_api/utils/number_format_currency.dart';
-import 'package:crud_api/widgets/shared_shimmer_list.dart';
 import 'package:flutter/material.dart';
 
 class ListInventoryPage extends StatefulWidget {
@@ -14,21 +10,33 @@ class ListInventoryPage extends StatefulWidget {
 }
 
 class _ListInventoryPageState extends State<ListInventoryPage> {
-  final InventoryService _inventoryService = InventoryService();
-  late Future<List<InventoryModel>> _futureInventory;
   String _searchQuery = '';
-
-  @override
-  void initState() {
-    _futureInventory = _inventoryService.getInventories();
-    super.initState();
-  }
-
-  Future<void> _refreshInventory() async {
-    setState(() {
-      _futureInventory = _inventoryService.getInventories();
-    });
-  }
+  final List<Map<String, dynamic>> _dummyData = [
+    {
+      'id': '1',
+      'title': 'Item 1',
+      'quantity': 10,
+      'price': 10000,
+      'imageUrl':
+          'https://images.tokopedia.net/img/cache/700/VqbcmM/2024/3/21/34e2aca4-19cc-4d43-ba91-f774d953035d.jpg'
+    },
+    {
+      'id': '2',
+      'title': 'Item 2',
+      'quantity': 5,
+      'price': 20000,
+      'imageUrl':
+          'https://images.tokopedia.net/img/cache/700/VqbcmM/2024/3/21/34e2aca4-19cc-4d43-ba91-f774d953035d.jpg'
+    },
+    {
+      'id': '3',
+      'title': 'Item 3',
+      'quantity': 15,
+      'price': 15000,
+      'imageUrl':
+          'https://images.tokopedia.net/img/cache/700/VqbcmM/2024/3/21/34e2aca4-19cc-4d43-ba91-f774d953035d.jpg'
+    },
+  ];
 
   void _updateSearchQuery(String query) {
     setState(() {
@@ -36,60 +44,18 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
     });
   }
 
-  List<InventoryModel> _filterInventory(List<InventoryModel> inventory) {
+  List<Map<String, dynamic>> _filterInventory(
+      List<Map<String, dynamic>> inventory) {
     if (_searchQuery.isEmpty) {
       return inventory;
     }
     return inventory
         .where((item) =>
-            item.title!.toLowerCase().contains(_searchQuery.toLowerCase()))
+            item['title'].toLowerCase().contains(_searchQuery.toLowerCase()))
         .toList();
   }
 
-  Widget _buildError(String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error, color: Colors.red, size: 64),
-          const SizedBox(height: 16),
-          Text(
-            'Error: $error',
-            style: const TextStyle(fontSize: 18, color: Colors.red),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _refreshInventory,
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmpty() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.inbox, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
-          const Text(
-            'No data found',
-            style: TextStyle(fontSize: 18, color: Colors.grey),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _refreshInventory,
-            child: const Text('Refresh'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInventoryList(List<InventoryModel> inventory) {
+  Widget _buildInventoryList(List<Map<String, dynamic>> inventory) {
     final filteredInventory = _filterInventory(inventory);
     if (filteredInventory.isEmpty) {
       return _buildEmpty();
@@ -116,7 +82,7 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
                   child: Image.network(
-                    filteredInventory[index].imageUrl ?? '',
+                    filteredInventory[index]['imageUrl'] ?? '',
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
@@ -131,7 +97,7 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      filteredInventory[index].title!,
+                      filteredInventory[index]['title']!,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -139,7 +105,7 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Text("ID: ${filteredInventory[index].id!}"),
+                    Text("ID: ${filteredInventory[index]['id']}"),
                     const SizedBox(height: 10),
                   ],
                 ),
@@ -147,12 +113,11 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Stock: ${filteredInventory[index].quantity}',
+                      'Stock: ${filteredInventory[index]['quantity']}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     Text(
-                      NumberFormatCurrency.formatCurrencyIdr(
-                          filteredInventory[index].price!),
+                      'Price: ${filteredInventory[index]['price']}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -161,11 +126,12 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
                   ],
                 ),
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) {
-                    return DetailInventoryPage(
-                      inventoryId: filteredInventory[index].id!,
-                    );
-                  }));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailInventoryPage(),
+                    ),
+                  );
                 },
               ),
             ),
@@ -175,15 +141,34 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
     }
   }
 
+  Widget _buildEmpty() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.inbox, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text(
+            'No data found',
+            style: TextStyle(fontSize: 18, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) {
-            return const AddInventoryPage();
-          }));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddInventoryPage(),
+            ),
+          );
         },
         child: const Icon(
           Icons.add,
@@ -214,23 +199,7 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: _refreshInventory,
-        child: FutureBuilder<List<InventoryModel>>(
-          future: _futureInventory,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return SharedShimmerList();
-            } else if (snapshot.hasError) {
-              return _buildError(snapshot.error.toString());
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return _buildEmpty();
-            } else {
-              return _buildInventoryList(snapshot.data!);
-            }
-          },
-        ),
-      ),
+      body: _buildInventoryList(_dummyData),
     );
   }
 }

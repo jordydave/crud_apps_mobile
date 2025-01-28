@@ -7,8 +7,8 @@ import 'package:logging/logging.dart';
 
 class InventoryService {
   final String apiUrl = 'https://inventories-ifxqr3l-jordy-dave.globeapp.dev';
-  final String githubUsername = 'jordydave';
-  final String githubRepo = 'store_image';
+  final String githubUsername = '';
+  final String githubRepo = '';
   final String githubToken = '';
   final Logger _logger = Logger('InventoryService');
 
