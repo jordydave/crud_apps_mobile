@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:crud_api/pages/list_inventory_page.dart';
+import 'package:crud_api/widgets/shared_textformfield.dart';
 import 'package:flutter/material.dart';
 import 'package:crud_api/models/inventory_model.dart';
 import 'package:crud_api/services/inventory_service.dart';
@@ -148,9 +149,9 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
             children: [
               ListView(
                 children: [
-                  TextFormField(
+                  SharedTextFormField(
                     controller: _titleController,
-                    decoration: const InputDecoration(labelText: 'Title'),
+                    labelText: 'Title',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter a title';
@@ -158,9 +159,10 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                       return null;
                     },
                   ),
-                  TextFormField(
+                  SizedBox(height: 10),
+                  SharedTextFormField(
                     controller: _descriptionController,
-                    decoration: const InputDecoration(labelText: 'Description'),
+                    labelText: 'Description',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter a description';
@@ -168,9 +170,10 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                       return null;
                     },
                   ),
-                  TextFormField(
+                  SizedBox(height: 10),
+                  SharedTextFormField(
                     controller: _priceController,
-                    decoration: const InputDecoration(labelText: 'Price'),
+                    labelText: 'Price',
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -187,9 +190,10 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                       return null;
                     },
                   ),
-                  TextFormField(
+                  SizedBox(height: 10),
+                  SharedTextFormField(
                     controller: _quantityController,
-                    decoration: const InputDecoration(labelText: 'Quantity'),
+                    labelText: 'Quantity',
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
