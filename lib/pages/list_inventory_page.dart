@@ -3,6 +3,7 @@ import 'package:crud_api/pages/add_inventory_page.dart';
 import 'package:crud_api/pages/detail_inventory_page.dart';
 import 'package:crud_api/services/inventory_service.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
+import 'package:crud_api/widgets/shared_shimmer_list.dart';
 import 'package:flutter/material.dart';
 
 class ListInventoryPage extends StatefulWidget {
@@ -90,9 +91,7 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
           future: _futureInventory,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return SharedShimmerList();
             } else if (snapshot.hasError) {
               return Center(
                 child: Column(
@@ -181,7 +180,7 @@ class _ListInventoryPageState extends State<ListInventoryPage> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text("ID: ${filteredInventory[index].id!}"),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                             ],
                           ),
                           subtitle: Row(

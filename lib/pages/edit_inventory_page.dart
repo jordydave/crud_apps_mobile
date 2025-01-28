@@ -242,7 +242,9 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
           if (_isLoading)
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: SharedLoading(),
+              child: SharedLoading(
+                indincatorColor: Colors.white,
+              ),
             ),
         ],
       ),

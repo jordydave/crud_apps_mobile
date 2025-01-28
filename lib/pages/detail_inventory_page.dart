@@ -86,8 +86,9 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
             future: _futureInventory,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
+                return SharedLoading(
+                  color: Colors.white,
+                  indincatorColor: Colors.black,
                 );
               } else if (snapshot.hasError) {
                 return Center(
@@ -128,7 +129,9 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
                       Text(
                         inventory.title ?? 'No Title',
                         style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -171,7 +174,9 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
           if (_isDeleting)
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: SharedLoading(),
+              child: SharedLoading(
+                indincatorColor: Colors.white,
+              ),
             ),
         ],
       ),
