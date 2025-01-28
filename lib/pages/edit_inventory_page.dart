@@ -5,6 +5,7 @@ import 'package:crud_api/services/inventory_service.dart';
 import 'package:crud_api/utils/app_utils.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:crud_api/widgets/shared_loading.dart';
+import 'package:crud_api/widgets/shared_textformfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -172,9 +173,9 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
               key: _formKey,
               child: ListView(
                 children: [
-                  TextFormField(
+                  SharedTextFormField(
                     controller: _titleController,
-                    decoration: const InputDecoration(labelText: 'Title'),
+                    labelText: 'Title',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter a title';
@@ -182,9 +183,10 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
                       return null;
                     },
                   ),
-                  TextFormField(
+                  SizedBox(height: 10),
+                  SharedTextFormField(
                     controller: _priceController,
-                    decoration: const InputDecoration(labelText: 'Price'),
+                    labelText: 'Price',
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -201,9 +203,10 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
                       return null;
                     },
                   ),
-                  TextFormField(
+                  SizedBox(height: 10),
+                  SharedTextFormField(
                     controller: _quantityController,
-                    decoration: const InputDecoration(labelText: 'Quantity'),
+                    labelText: 'Quantity',
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
