@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'package:crud_api/pages/list_inventory_page.dart';
+import 'package:crud_api/utils/app_utils.dart';
+import 'package:crud_api/utils/formatter_price.dart';
 import 'package:crud_api/widgets/shared_loading.dart';
 import 'package:crud_api/widgets/shared_textformfield.dart';
 import 'package:flutter/material.dart';
 import 'package:crud_api/models/inventory_model.dart';
 import 'package:crud_api/services/inventory_service.dart';
-import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:ui';
@@ -30,7 +31,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
   @override
   void initState() {
     super.initState();
-    _priceController.addListener(_formatPrice);
+    _priceController.addListener(() => formatterPrice(_priceController));
   }
 
   @override
@@ -40,36 +41,6 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
     _priceController.dispose();
     _quantityController.dispose();
     super.dispose();
-  }
-
-  void _formatPrice() {
-    final currentText = _priceController.text;
-    final cursorPosition = _priceController.selection.base.offset;
-
-    String numericText = currentText.replaceAll(RegExp(r'[^0-9]'), '');
-
-    if (numericText.isEmpty) {
-      _priceController.value = TextEditingValue(
-        text: '',
-        selection: TextSelection.collapsed(offset: 0),
-      );
-      return;
-    }
-
-    final double parsedValue = double.parse(numericText);
-    final formattedText = NumberFormatCurrency.formatCurrencyIdr(parsedValue);
-
-    int newCursorPosition =
-        cursorPosition + (formattedText.length - currentText.length);
-
-    if (formattedText != currentText) {
-      _priceController.value = TextEditingValue(
-        text: formattedText,
-        selection: TextSelection.collapsed(
-          offset: newCursorPosition.clamp(0, formattedText.length),
-        ),
-      );
-    }
   }
 
   Future<void> _pickImage() async {
@@ -85,9 +56,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       if (_image == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please pick an image')),
-        );
+        AppUtils.showSnackBar(context, 'Please pick an image');
         return;
       }
 
@@ -112,9 +81,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
       try {
         await _inventoryService.createInventory(newInventory);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Inventory added successfully')),
-          );
+          AppUtils.showSnackBar(context, 'Inventory added successfully');
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (_) => const ListInventoryPage()),
@@ -123,9 +90,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
-          );
+          AppUtils.showSnackBar(context, 'Error: $e');
         }
       } finally {
         if (mounted) {

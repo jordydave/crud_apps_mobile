@@ -1,5 +1,6 @@
 import 'package:crud_api/pages/edit_inventory_page.dart';
 import 'package:crud_api/pages/list_inventory_page.dart';
+import 'package:crud_api/utils/app_utils.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:crud_api/widgets/shared_loading.dart';
 import 'package:flutter/material.dart';
@@ -45,21 +46,14 @@ class _DetailInventoryPageState extends State<DetailInventoryPage> {
       await _inventoryService.deleteInventory(widget.inventoryId);
       backToHome();
     } catch (e) {
-      snackbarMessage('Failed to delete inventory: $e');
+      if (mounted) {
+        AppUtils.showSnackBar(context, 'Failed to delete inventory: $e');
+      }
     } finally {
       setState(() {
         _isDeleting = false;
       });
     }
-  }
-
-  void snackbarMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   @override

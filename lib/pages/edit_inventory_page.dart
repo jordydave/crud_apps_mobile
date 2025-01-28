@@ -3,6 +3,7 @@ import 'package:crud_api/models/inventory_model.dart';
 import 'package:crud_api/pages/list_inventory_page.dart';
 import 'package:crud_api/services/inventory_service.dart';
 import 'package:crud_api/utils/app_utils.dart';
+import 'package:crud_api/utils/formatter_price.dart';
 import 'package:crud_api/utils/number_format_currency.dart';
 import 'package:crud_api/widgets/shared_loading.dart';
 import 'package:crud_api/widgets/shared_textformfield.dart';
@@ -34,7 +35,7 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
   void initState() {
     super.initState();
     _fetchInventoryDetails();
-    _priceController.addListener(_formatPrice);
+    _priceController.addListener(() => formatterPrice(_priceController));
   }
 
   @override
@@ -43,36 +44,6 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
     _priceController.dispose();
     _quantityController.dispose();
     super.dispose();
-  }
-
-  void _formatPrice() {
-    final currentText = _priceController.text;
-    final cursorPosition = _priceController.selection.base.offset;
-
-    String numericText = currentText.replaceAll(RegExp(r'[^0-9]'), '');
-
-    if (numericText.isEmpty) {
-      _priceController.value = TextEditingValue(
-        text: '',
-        selection: TextSelection.collapsed(offset: 0),
-      );
-      return;
-    }
-
-    final double parsedValue = double.parse(numericText);
-    final formattedText = NumberFormatCurrency.formatCurrencyIdr(parsedValue);
-
-    int newCursorPosition =
-        cursorPosition + (formattedText.length - currentText.length);
-
-    if (formattedText != currentText) {
-      _priceController.value = TextEditingValue(
-        text: formattedText,
-        selection: TextSelection.collapsed(
-          offset: newCursorPosition.clamp(0, formattedText.length),
-        ),
-      );
-    }
   }
 
   Future<void> _fetchInventoryDetails() async {
@@ -134,9 +105,7 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
         await _inventoryService.updateInventory(
             widget.inventoryId, updatedInventory);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Inventory updated successfully')),
-          );
+          AppUtils.showSnackBar(context, 'Inventory updated successfully');
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (_) => const ListInventoryPage()),
@@ -145,9 +114,7 @@ class _EditInventoryPageState extends State<EditInventoryPage> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
-          );
+          AppUtils.showSnackBar(context, 'Error: $e');
         }
       } finally {
         if (mounted) {
