@@ -57,7 +57,7 @@ class InventoryService {
   Future<List<InventoryModel>> getInventories() async {
     String getInventories = '$apiUrl/getInventories';
     _logger.info('Fetching inventories from API $getInventories');
-    _logger.info('curl -X GET "$apiUrl" -H "accept: application/json"');
+    _logger.info('curl -X GET "$getInventories" -H "accept: application/json"');
     try {
       final response = await _getClient().get(Uri.parse(getInventories));
 
@@ -82,8 +82,7 @@ class InventoryService {
   Future<InventoryModel> getInventoryById(String recordId) async {
     String getInventory = '$apiUrl/getInventoryById?recordId=$recordId';
     _logger.info('Fetching inventory $recordId from API $getInventory');
-    _logger
-        .info('curl -X GET "$apiUrl/$recordId" -H "accept: application/json"');
+    _logger.info('curl -X GET "$getInventory" -H "accept: application/json"');
     final response = await _getClient().get(Uri.parse(getInventory));
 
     if (response.statusCode == 200) {
@@ -122,7 +121,7 @@ class InventoryService {
     String updateInventory = '$apiUrl/updateInventory';
     _logger.info('Updating inventory $recordId from API $updateInventory');
     _logger.info(
-        'curl -X PUT "$apiUrl/$recordId" -H "accept: application/json" -H "Content-Type: application/json" -d \'${jsonEncode(inventory.toJson())}\'');
+        'curl -X PUT "$updateInventory" -H "accept: application/json" -H "Content-Type: application/json" -d \'${jsonEncode(inventory.toJson())}\'');
     final response = await _getClient().put(
       Uri.parse(updateInventory),
       headers: <String, String>{
@@ -143,6 +142,8 @@ class InventoryService {
   Future<void> deleteInventory(String recordId) async {
     String deleteInventory = '$apiUrl/deleteInventory';
     _logger.info('Deleting inventory $recordId from API $deleteInventory');
+    _logger.info(
+        'curl -X DELETE "$deleteInventory?recordId=$recordId" -H "accept: application/json"');
     final response = await _getClient().delete(
       Uri.parse('$deleteInventory?recordId=$recordId'),
     );
